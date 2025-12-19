@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web App Lifecycle - Interactive Presentation</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+   
+    <style>
+        /* --- 1. CORE THEME & RESET --- */
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8; /* Sky Blue */
+            --accent-glow: rgba(56, 189, 248, 0.15);
+            --border: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- 2. LAYOUT & CONTAINER --- */
+        /* This centers the content and creates the "Slide" effect */
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+            padding: 40px 0;
+        }
+
+        .slide-container {
+            width: 90%;
+            max-width: 1280px;
+            height: 720px; /* Fixed height for presentation feel */
+            background: var(--card-bg);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden; /* Keeps content inside the rounded corners */
+            display: flex;
+            flex-direction: column;
+            padding: 60px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            /* Snap scrolling effect */
+            scroll-snap-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Subtle hover effect for the active slide */
+        .slide-container:hover {
+            border-color: #374151;
+            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Decorative Background Elements */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, var(--accent-glow) 0%, transparent 60%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .slide-container > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- 3. TYPOGRAPHY --- */
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        h1 { font-size: 72px; font-weight: 700; letter-spacing: -2px; }
+        h2 { font-size: 48px; font-weight: 600; margin-bottom: 30px; letter-spacing: -1px; }
+        h3 { font-size: 24px; font-weight: 600; color: var(--accent); margin-bottom: 15px; }
+
+        p, li {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            max-width: 800px;
+        }
+
+        .slide-header {
+            width: 100%;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+        }
+
+        .slide-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 60px;
+            color: #1f2937;
+            font-weight: 700;
+            line-height: 0.8;
+        }
+
+        /* --- 4. GRID SYSTEMS --- */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            height: 100%;
+        }
+
+        .tiled-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            width: 100%;
+        }
+
+        /* --- 5. COMPONENTS --- */
+
+        /* Tiles / Cards */
+        .tile {
+            background: #1f2937;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .tile .icon {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            background: rgba(56, 189, 248, 0.1);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        /* Images */
+        .image-wrapper {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            height: 100%;
+            max-height: 400px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .image-wrapper:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Lists */
+        ul { list-style: none; padding: 0; }
+        li { margin-bottom: 15px; padding-left: 30px; position: relative; }
+        li::before {
+            content: '→';
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* Charts */
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            background: rgba(31, 41, 55, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .nav-btn:hover { color: var(--accent); }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 1024px) {
+            .slide-container { height: auto; min-height: 720px; }
+            .two-column { grid-template-columns: 1fr; }
+            .tiled-content { grid-template-columns: 1fr; }
+            h1 { font-size: 48px; }
+            h2 { font-size: 36px; }
+         .info-group {
+            text-align: left;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Navigation -->
+    <div class="nav-controls">
+        <span class="nav-btn" onclick="prevSlide()"><i class="fa-solid fa-arrow-up"></i> Prev</span>
+        <span class="nav-btn" onclick="nextSlide()">Next <i class="fa-solid fa-arrow-down"></i></span>
+    </div>
+
+    <main id="presentation-main">
+
+        <!-- Slide 1: Title -->
+        <div class="slide-container" id="slide-1">
+            <div class="content-area" style="align-items: center; text-align: center;">
+                <p style="color: var(--accent); text-transform: uppercase; letter-spacing: 4px; font-weight: 700;">The Masterclass</p>
+                <h1>Modern Web Application<br><span style="color: var(--accent);">Development Lifecycle</span></h1>
+                <p style="margin-top: 20px; font-size: 24px;">From Conception to Continuous Operation</p>
+             <div class="info-group">
+            <span class="label"> Name</span>
+            <span class="value">Saliq Naqash</span>
+        </div>
+
+        <div class="info-group">
+            <span class="label">Enrollment Number</span>
+            <span class="value">2324cukmr 29</span>
+        </div>
+
+                <div style="margin-top: 40px; padding: 15px 40px; border: 1px solid var(--accent); color: var(--accent); border-radius: 50px; cursor: pointer;" onclick="nextSlide()">
+                    Start Presentation
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Methodologies -->
+        <div class="slide-container" id="slide-2">
+            <div class="slide-header">
+                <h2>1. The Framework of Execution</h2>
+                <div class="slide-number">02</div>
+            </div>
+            <div class="content-area">
+                <div class="tiled-content">
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
+                        <h3>Waterfall</h3>
+                        <p>Linear and sequential. Best for stable, fixed requirements where changes are costly and predictability is key.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-arrows-spin"></i></div>
+                        <h3>Agile</h3>
+                        <p>Iterative and flexible. Breaks work into 2-week "sprints" to deliver value and gather feedback continuously.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-infinity"></i></div>
+                        <h3>DevOps</h3>
+                        <p>Cultural unity. Bridges Dev and Ops with automation (CI/CD) to deploy code rapidly, safely, and frequently.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Discovery Phase -->
+        <div class="slide-container" id="slide-3">
+            <div class="slide-header">
+                <h2>Phase I: Discovery & Planning</h2>
+                <div class="slide-number">03</div>
+            </div>
+            <div class="content-area">
+                <div class="two-column">
+                    <div>
+                        <h3>Risk Mitigation Strategy</h3>
+                        <p>The most critical phase involves validating assumptions to prevent "Scope Creep"—the #1 cause of budget failure.</p>
+                        <br>
+                        <ul>
+                            <li><strong>Stakeholder Workshops:</strong> Aligning business goals with tech reality.</li>
+                            <li><strong>User Personas:</strong> Defining exactly who the product is for.</li>
+                            <li><strong>Feasibility Studies:</strong> Assessing technical and financial viability.</li>
+                        </ul>
+                    </div>
+                    <div class="image-wrapper">
+                        <!-- Placeholder Image -->
+                        <img src="https://placehold.co/600x400/1f2937/38bdf8?text=Discovery+Session&font=roboto" alt="Team Planning">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Architecture -->
+        <div class="slide-container" id="slide-4">
+            <div class="slide-header">
+                <h2>Phase II: Strategic Architecture</h2>
+                <div class="slide-number">04</div>
+            </div>
+            <div class="content-area">
+                <div class="two-column">
+                    <div class="image-wrapper">
+                         <img src="https://placehold.co/600x400/1f2937/38bdf8?text=Monolith+vs+Microservices&font=roboto" alt="Architecture Diagram">
+                    </div>
+                    <div>
+                        <h3>Monolith vs. Microservices</h3>
+                        <p><strong>Monolithic:</strong> All-in-one. Simpler to build initially, but harder to scale.</p>
+                        <p><strong>Microservices:</strong> Decoupled services. Complex to manage, but offers immense scalability and fault tolerance.</p>
+                        <br>
+                        <h3>The Tech Stack</h3>
+                        <p>Moving from legacy <strong>LAMP</strong> to modern <strong>MERN</strong> (MongoDB, Express, React, Node) allows for unified JavaScript development across the entire stack.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Design (UI/UX) -->
+        <div class="slide-container" id="slide-5">
+            <div class="slide-header">
+                <h2>Phase III: Experience Design</h2>
+                <div class="slide-number">05</div>
+            </div>
+            <div class="content-area">
+                <div class="two-column">
+                    <div>
+                        <h3>UX (Logic) vs UI (Aesthetic)</h3>
+                        <p>We use tools like <strong>Figma</strong> to bridge the gap between design and code.</p>
+                        <div class="tile" style="margin-top: 20px; flex-direction: row; text-align: left; align-items: center; padding: 20px;">
+                            <i class="fa-solid fa-pen-ruler" style="color: var(--accent); font-size: 30px; margin-right: 20px;"></i>
+                            <div>
+                                <strong style="color: #fff; display: block; margin-bottom: 5px;">Wireframing</strong>
+                                <span style="font-size: 16px;">The blueprint. Focuses on user flow and layout without distraction.</span>
+                            </div>
+                        </div>
+                        <div class="tile" style="margin-top: 10px; flex-direction: row; text-align: left; align-items: center; padding: 20px;">
+                            <i class="fa-solid fa-palette" style="color: var(--accent); font-size: 30px; margin-right: 20px;"></i>
+                            <div>
+                                <strong style="color: #fff; display: block; margin-bottom: 5px;">Prototyping</strong>
+                                <span style="font-size: 16px;">High-fidelity mockups that simulate the final product interaction.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/600x400/1f2937/38bdf8?text=UI+UX+Design+Flow&font=roboto" alt="UI UX Design">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Development -->
+        <div class="slide-container" id="slide-6">
+            <div class="slide-header">
+                <h2>Phase IV: Development</h2>
+                <div class="slide-number">06</div>
+            </div>
+            <div class="content-area">
+                <div class="tiled-content">
+                    <div class="tile">
+                        <div class="icon"><i class="fa-brands fa-react"></i></div>
+                        <h3>Front-End</h3>
+                        <p>Client-side (React, Vue). What the user sees and interacts with. Focused on responsiveness and state management.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-brands fa-node"></i></div>
+                        <h3>Back-End</h3>
+                        <p>Server-side (Node.js, Python). The logic layer that processes API requests, authentication, and business rules.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-database"></i></div>
+                        <h3>Database</h3>
+                        <p>Data persistence (SQL vs NoSQL). Designing schemas to store user data efficiently and securely.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Quality Assurance -->
+        <div class="slide-container" id="slide-7">
+            <div class="slide-header">
+                <h2>Phase V: Quality Assurance</h2>
+                <div class="slide-number">07</div>
+            </div>
+            <div class="content-area">
+                <div class="two-column">
+                    <div>
+                        <h3>The "Shift Left" Philosophy</h3>
+                        <p>We test early and often, not just at the end. Automated testing ensures reliability.</p>
+                        <br>
+                        <ul>
+                            <li><strong>Functional Testing:</strong> Does the feature work as intended?</li>
+                            <li><strong>Performance Testing:</strong> Can it handle Black Friday traffic?</li>
+                            <li><strong>Security (OWASP):</strong> Scanning for SQL Injection & XSS.</li>
+                        </ul>
+                    </div>
+                    <div class="chart-container">
+                        <!-- CSS/HTML Bar Chart Visualization -->
+                        <div style="display: flex; gap: 20px; align-items: flex-end; height: 200px; width: 80%;">
+                            <div style="width: 30%; background: #374151; height: 40%; border-radius: 8px 8px 0 0; position: relative;">
+                                <div style="position: absolute; bottom: -30px; width: 100%; text-align: center; color: #94a3b8; font-size: 14px;">Manual</div>
+                            </div>
+                            <div style="width: 30%; background: var(--accent); height: 80%; border-radius: 8px 8px 0 0; position: relative;">
+                                <div style="position: absolute; bottom: -30px; width: 100%; text-align: center; color: #fff; font-size: 14px;">Automated</div>
+                            </div>
+                            <div style="width: 30%; background: #22c55e; height: 95%; border-radius: 8px 8px 0 0; position: relative;">
+                                <div style="position: absolute; bottom: -30px; width: 100%; text-align: center; color: #fff; font-size: 14px;">AI Assisted</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Deployment -->
+        <div class="slide-container" id="slide-8">
+            <div class="slide-header">
+                <h2>Phase VI: Deployment</h2>
+                <div class="slide-number">08</div>
+            </div>
+            <div class="content-area">
+                <div class="two-column">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/600x400/1f2937/38bdf8?text=CI+CD+Pipeline&font=roboto" alt="Deployment Pipeline">
+                    </div>
+                    <div>
+                        <h3>Zero Downtime Launch</h3>
+                        <p>Gone are the days of manual uploads via FTP.</p>
+                        <br>
+                        <div class="tile" style="text-align: left; padding: 20px; margin-bottom: 15px;">
+                            <h3 style="font-size: 20px; margin-bottom: 5px;"><i class="fa-brands fa-docker"></i> Containerization</h3>
+                            <p style="font-size: 16px; margin: 0;">Docker ensures the app runs exactly the same on a laptop as it does in the cloud.</p>
+                        </div>
+                        <div class="tile" style="text-align: left; padding: 20px;">
+                            <h3 style="font-size: 20px; margin-bottom: 5px;"><i class="fa-solid fa-rocket"></i> CI/CD Pipelines</h3>
+                            <p style="font-size: 16px; margin: 0;">Automated robots run tests and deploy code instantly when developers save their work.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Maintenance -->
+        <div class="slide-container" id="slide-9">
+            <div class="slide-header">
+                <h2>Phase VII: Maintenance</h2>
+                <div class="slide-number">09</div>
+            </div>
+            <div class="content-area">
+                <div class="two-column">
+                    <div>
+                        <h3>Combating Digital Decay</h3>
+                        <p>Software requires care to survive security threats and browser updates.</p>
+                        <p><strong>The ROI of Maintenance:</strong> Retaining a user is 5x cheaper than acquiring a new one. Speed and reliability are key retention drivers.</p>
+                    </div>
+                    <div class="chart-container">
+                        <svg viewBox="0 0 500 200" style="width: 100%; height: 100%;">
+                            <path d="M0,200 Q100,150 250,100 T500,20" fill="none" stroke="#38bdf8" stroke-width="4" />
+                            <circle cx="0" cy="200" r="4" fill="#fff" />
+                            <circle cx="250" cy="100" r="4" fill="#fff" />
+                            <circle cx="500" cy="20" r="4" fill="#fff" />
+                            <text x="10" y="190" fill="#94a3b8" font-size="12">Launch</text>
+                            <text x="400" y="40" fill="#94a3b8" font-size="12">Long Term Growth</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Future Trends -->
+        <div class="slide-container" id="slide-10">
+            <div class="slide-header">
+                <h2>The Future of Web Dev</h2>
+                <div class="slide-number">10</div>
+            </div>
+            <div class="content-area">
+                <div class="tiled-content">
+                    <div class="tile" style="border-color: #a855f7;">
+                        <div class="icon" style="color: #a855f7; background: rgba(168, 85, 247, 0.1);"><i class="fa-solid fa-robot"></i></div>
+                        <h3>AI Integration</h3>
+                        <p>Coding assistants (Copilot) and AI-generated UIs are accelerating speed.</p>
+                    </div>
+                    <div class="tile" style="border-color: #22c55e;">
+                        <div class="icon" style="color: #22c55e; background: rgba(34, 197, 94, 0.1);"><i class="fa-solid fa-cloud"></i></div>
+                        <h3>Serverless</h3>
+                        <p>Abstracting infrastructure entirely. Pay only for the compute you use.</p>
+                    </div>
+                    <div class="tile" style="border-color: #f59e0b;">
+                        <div class="icon" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);"><i class="fa-solid fa-mobile-screen"></i></div>
+                        <h3>PWAs</h3>
+                        <p>Web apps that behave like native mobile apps (Offline mode, Push notifications).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Conclusion -->
+        <div class="slide-container" id="slide-11" style="background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);">
+            <div class="content-area" style="text-align: center;">
+                <h1 style="font-size: 60px;">Building the <span style="color: var(--accent);">Future</span></h1>
+                <p style="font-size: 24px; margin-top: 30px;">Success lies in the alignment of Strategy, Design, and Engineering.</p>
+                <div style="margin-top: 60px;">
+                    <p style="font-size: 18px; opacity: 0.8;">Presentation created by Saliq Naqsah</p>
+                    <p style="font-size: 16px; opacity: 0.5;">Thank you for listening.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Simple Navigation Logic
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function updateSlide() {
+            const slideElement = document.getElementById(`slide-${currentSlide}`);
+            if (slideElement) {
+                slideElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>
